@@ -1,0 +1,23 @@
+{
+  "name": "youtube-description-generator",
+  "version": "1.0.0",
+  "description": "Generate YouTube video titles and descriptions with OpenAI and video transcripts",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "chrome-extension",
+    "youtube",
+    "openai",
+    "description-generator"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.18",
+    "vite": "^5.0.0"
+  }
+}

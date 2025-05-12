@@ -25,8 +25,6 @@
 
 ## Demo
 
-![YouTube Studio Extension Demo](./demo.png)
-
 *The extension in action: auto-filling the title and description fields in YouTube Studio.*
 
 ---
