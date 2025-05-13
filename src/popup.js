@@ -6,6 +6,7 @@ const transcriptDiv = document.getElementById('transcript');
 const statusMessage = document.getElementById('status-message');
 const serverUrlInput = document.getElementById('server-url'); 
 const saveServerUrlButton = document.getElementById('save-server-url');
+const clearPromptButton = document.getElementById('clear-prompt');
 
 // Generated content elements
 const generatedContentSection = document.getElementById('generated-content');
@@ -22,7 +23,34 @@ let currentGeneratedContent = {
 };
 
 // Default prompt
-const DEFAULT_PROMPT = "Generate a YouTube title and description based on the following transcript. Title should be catchy and SEO-friendly. Description should summarize key points, include timestamps for major sections, and ask viewers to like and subscribe. My name is spelled as Aemal Sayer. The technologies I mention and use in my videos include n8n and Vapi. Don't give timestamps, just generate a general information about the current lecture and keep the first part as general information about this crash course called 'Build your own voice ai agent using n8n, vapi and some vibe coding'. Don't mention 'Aemal Sayer' teaches you... don't use the 3rd person, write it from my perspective. Please add hashtags and CTA to comment, subscribe and share for better SEO and reach.";
+const DEFAULT_PROMPT = "Generate a YouTube title and description based on the following transcript. Title should be catchy and SEO-friendly. Description should summarize key points, include timestamps for major sections, and ask viewers to like and subscribe. My name is spelled as Aemal Sayer. The technologies I mention and use in my videos include n8n and Vapi. Don't give timestamps, just generate a general information about the current lecture and keep the first part as general information about this crash course called 'Build your own voice ai agent using n8n, vapi and some vibe coding'. Don't mention 'Aemal Sayer' teaches you... don't use the 3rd person, write it from my perspective. Please add hashtags and CTA to comment, subscribe and share for better SEO and reach. Don't use markdown, use simple bullet points as the youtube description do not support markdown. Don't '**' in the description, use simple bullet points. \n\
+  for exmaple: \n\
+\n\
+  this is wrong: \n\
+  **Course Breakdown:**\n\
+- **Introduction:** Overview of the course and what you'll build.\n\
+- **Part 1:** Learn to compose emails using your AI.\n\
+- **Part 2:** Discover how to read emails with your AI.\n\
+- **Part 3:** Dive into vibe coding for customizing your AI agent beyond Vapi and n8n.\n\
+\n\
+\n\
+this is correct: \n\
+Course Breakdown:\n\
+- Introduction: Overview of the course and what you'll build.\n\
+- Part 1: Learn to compose emails using your AI.\n\
+- Part 2: Discover how to read emails with your AI.\n\
+- Part 3: Dive into vibe coding for customizing your AI agent beyond Vapi and n8n.\n\
+  \n\
+IMPORTANT NOTE: \n\
+Add this block of text at the start of the description: \n\
+\n\
+Access the full crash course playlist here: \n\
+https://www.youtube.com/playlist?list=PLWYu7XaUG3XMJ_GmhrcB4dY_w6MjKaaT2\n\
+\n\
+NOTE: \n\
+\n\
+Always start with these hash tags: \n\
+#AI #AIAgents #VoiceAI #n8n #vapi #VibeCoding";
 
 // Get server URL from background script
 async function getServerUrl() {
@@ -310,6 +338,17 @@ function showStatus(message, type = 'info') {
   }, 3000);
 }
 
+// Set loading state for content boxes
+function setContentBoxesLoading(isLoading) {
+  if (isLoading) {
+    generatedTitleElement.classList.add('loading');
+    generatedDescriptionElement.classList.add('loading');
+  } else {
+    generatedTitleElement.classList.remove('loading');
+    generatedDescriptionElement.classList.remove('loading');
+  }
+}
+
 // Get video ID from active tab
 async function getCurrentTabVideoId() {
   try {
@@ -429,12 +468,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Generate description button
 generateButton.addEventListener('click', async () => {
   try {
+    // Clear previous results first
+    generatedTitleElement.textContent = '';
+    generatedDescriptionElement.textContent = '';
+    
+    // Show the content section even when empty
+    generatedContentSection.style.display = 'block';
+    
+    // Set content boxes to loading state
+    setContentBoxesLoading(true);
+    
+    // Show loading state on the button
+    const originalButtonText = generateButton.textContent;
+    generateButton.textContent = 'Generating...';
+    generateButton.classList.add('loading');
+    
     // Get prompt from textarea or use default
     const promptText = promptTextarea.value.trim() || DEFAULT_PROMPT;
     const videoId = await getCurrentTabVideoId();
     
     if (!videoId) {
       showStatus('No YouTube video detected', 'error');
+      setContentBoxesLoading(false);
       return;
     }
     
@@ -456,7 +511,10 @@ generateButton.addEventListener('click', async () => {
     
     if (!transcript) {
       showStatus('Failed to get transcript', 'error');
+      setContentBoxesLoading(false);
       generateButton.disabled = false;
+      generateButton.textContent = originalButtonText;
+      generateButton.classList.remove('loading');
       return;
     }
     
@@ -472,6 +530,18 @@ generateButton.addEventListener('click', async () => {
     console.error('Generation error:', error);
     showStatus(`Error: ${error.message}`, 'error');
   } finally {
+    // Reset loading states
+    setContentBoxesLoading(false);
+    
+    // Reset button state
     generateButton.disabled = false;
+    generateButton.textContent = 'Generate Description';
+    generateButton.classList.remove('loading');
   }
+});
+
+// Clear prompt button
+clearPromptButton.addEventListener('click', () => {
+  promptTextarea.value = '';
+  showStatus('Using default prompt', 'info');
 }); 

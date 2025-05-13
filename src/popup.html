@@ -20,7 +20,10 @@
     
     <div class="prompt-section">
       <label for="prompt">Custom Prompt:</label>
-      <textarea id="prompt" placeholder="Enter your custom prompt for the AI"></textarea>
+      <div class="textarea-wrapper" style="position: relative;">
+        <textarea id="prompt" placeholder="Enter your custom prompt for the AI"></textarea>
+        <button id="clear-prompt" class="clear-prompt" title="Clear prompt and use default">×</button>
+      </div>
       <button id="save-prompt">Save Prompt</button>
     </div>
     

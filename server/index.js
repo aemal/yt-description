@@ -15,7 +15,36 @@ const CONFIG_PATH = path.join(__dirname, 'config.json');
 
 // Default config
 let config = {
-  defaultPrompt: 'Generate a YouTube title and description based on the following transcript. Title should be catchy and SEO-friendly. Description should summarize key points, include timestamps for major sections, and ask viewers to like and subscribe.'
+  defaultPrompt: `Generate a YouTube title and description based on the following transcript. Title should be catchy and SEO-friendly. Description should summarize key points, include timestamps for major sections, and ask viewers to like and subscribe. My name is spelled as Aemal Sayer. The technologies I mention and use in my videos include n8n and Vapi. Don't give timestamps, just generate a general information about the current lecture and keep the first part as general information about this crash course called 'Build your own voice ai agent using n8n, vapi and some vibe coding'. Don't mention 'Aemal Sayer' teaches you... don't use the 3rd person, write it from my perspective. Please add hashtags and CTA to comment, subscribe and share for better SEO and reach. Don't use markdown, use simple bullet points as the youtube description do not support markdown. Don't '**' in the description, use simple bullet points. 
+  for exmaple: 
+
+  this is wrong: 
+  **Course Breakdown:**
+- **Introduction:** Overview of the course and what you'll build.
+- **Part 1:** Learn to compose emails using your AI.
+- **Part 2:** Discover how to read emails with your AI.
+- **Part 3:** Dive into vibe coding for customizing your AI agent beyond Vapi and n8n.
+
+
+this is correct: 
+Course Breakdown:
+- Introduction: Overview of the course and what you'll build.
+- Part 1: Learn to compose emails using your AI.
+- Part 2: Discover how to read emails with your AI.
+- Part 3: Dive into vibe coding for customizing your AI agent beyond Vapi and n8n.
+  
+IMPORTANT NOTE: 
+Add this block of text at the start of the description: 
+
+Access the full crash course playlist here: 
+https://www.youtube.com/playlist?list=PLWYu7XaUG3XMJ_GmhrcB4dY_w6MjKaaT2
+
+NOTE: 
+
+Always start with these hash tags: 
+#AI #AIAgents #VoiceAI #n8n #vapi #VibeCoding
+
+`
 };
 
 // Load API key from environment variable
@@ -209,7 +238,7 @@ app.post('/api/generate', async (req, res) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant that generates YouTube titles and descriptions.'
+            content: 'You are a helpful assistant that generates YouTube titles and descriptions. Always follow the user\'s instructions carefully for the title and description format. Make sure to include the playlist link at the start of the description exactly as specified. Never use markdown formatting in descriptions, as YouTube does not support it. Use simple bullet points and plain text only. Pay attention to specific formatting requirements like avoiding bold formatting in bullet points. Also ensure you include the specific hashtags at the beginning of the description as requested (#AI #AIAgents #VoiceAI #n8n #vapi #VibeCoding).'
           },
           {
             role: 'user',
