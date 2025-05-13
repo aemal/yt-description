@@ -41,7 +41,7 @@ https://www.youtube.com/playlist?list=PLWYu7XaUG3XMJ_GmhrcB4dY_w6MjKaaT2
 
 NOTE: 
 
-Always start with these hash tags: 
+Put these hashtags at the end of the description, you can extract more hashtags from the transcript. 
 #AI #AIAgents #VoiceAI #n8n #vapi #VibeCoding
 
 `
