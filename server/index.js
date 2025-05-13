@@ -3,16 +3,98 @@ const cors = require('cors');
 const axios = require('axios');
 const { parseStringPromise } = require('xml2js');
 const { getSubtitles } = require('youtube-captions-scraper');
+const fs = require('fs');
+const path = require('path');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3040;
 
+// Config file path
+const CONFIG_PATH = path.join(__dirname, 'config.json');
+
+// Default config
+let config = {
+  defaultPrompt: 'Generate a YouTube title and description based on the following transcript. Title should be catchy and SEO-friendly. Description should summarize key points, include timestamps for major sections, and ask viewers to like and subscribe.'
+};
+
+// Load API key from environment variable
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
+
+// Load config if exists
+try {
+  if (fs.existsSync(CONFIG_PATH)) {
+    const configData = fs.readFileSync(CONFIG_PATH, 'utf8');
+    config = { ...config, ...JSON.parse(configData) };
+    console.log('Config loaded successfully');
+  } else {
+    // Create default config file
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+    console.log('Default config created');
+  }
+} catch (error) {
+  console.error('Error loading config:', error.message);
+}
+
+// Save config
+function saveConfig() {
+  try {
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2));
+    console.log('Config saved successfully');
+    return true;
+  } catch (error) {
+    console.error('Error saving config:', error.message);
+    return false;
+  }
+}
+
 // Enable CORS for all routes
 app.use(cors());
+app.use(express.json());
 
 // Health check endpoint
 app.get('/', (req, res) => {
-  res.json({ status: 'YouTube Description API is running' });
+  res.json({ 
+    status: 'YouTube Description API is running',
+    apiKeyConfigured: Boolean(OPENAI_API_KEY)
+  });
+});
+
+// Get config
+app.get('/api/config', (req, res) => {
+  // Don't send the API key to the frontend, just whether it's set
+  res.json({
+    success: true, 
+    config: {
+      hasApiKey: Boolean(OPENAI_API_KEY),
+      defaultPrompt: config.defaultPrompt
+    }
+  });
+});
+
+// Update config
+app.post('/api/config', (req, res) => {
+  try {
+    const { defaultPrompt } = req.body;
+    
+    if (defaultPrompt !== undefined) {
+      config.defaultPrompt = defaultPrompt;
+    }
+    
+    const saved = saveConfig();
+    
+    if (saved) {
+      res.json({ 
+        success: true, 
+        message: 'Config updated successfully',
+        hasApiKey: Boolean(OPENAI_API_KEY)
+      });
+    } else {
+      res.status(500).json({ success: false, error: 'Failed to save config' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 // Endpoint to fetch YouTube captions
@@ -94,23 +176,30 @@ app.get('/api/captions-fallback/:videoId', async (req, res) => {
 });
 
 // OpenAI proxy endpoint to avoid exposing API key in client-side code
-app.post('/api/generate', express.json(), async (req, res) => {
+app.post('/api/generate', async (req, res) => {
   try {
-    const { apiKey, prompt, transcript } = req.body;
+    const { prompt, transcript } = req.body;
     
-    if (!apiKey) {
-      return res.status(400).json({ success: false, error: 'API key is required' });
+    // Check if API key is configured
+    if (!OPENAI_API_KEY) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'OpenAI API key not configured. Please add OPENAI_API_KEY to the .env file.' 
+      });
     }
     
-    if (!prompt || !transcript) {
-      return res.status(400).json({ success: false, error: 'Prompt and transcript are required' });
+    if (!transcript) {
+      return res.status(400).json({ success: false, error: 'Transcript is required' });
     }
+    
+    // Use provided prompt or default
+    const promptText = prompt || config.defaultPrompt;
     
     console.log('Generating content with OpenAI');
     
     // Format transcript
     const fullTranscript = transcript.map(item => item.text).join(' ');
-    const fullPrompt = `${prompt}\n\nTranscript:\n${fullTranscript.substring(0, 15000)}`;
+    const fullPrompt = `${promptText}\n\nTranscript:\n${fullTranscript.substring(0, 15000)}`;
     
     // Call OpenAI API
     const openaiResponse = await axios.post(
@@ -132,7 +221,7 @@ app.post('/api/generate', express.json(), async (req, res) => {
       {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': `Bearer ${OPENAI_API_KEY}`
         }
       }
     );
@@ -155,5 +244,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
   console.log(`👉 Captions API: http://localhost:${PORT}/api/captions/:videoId`);
   console.log(`👉 OpenAI Proxy: http://localhost:${PORT}/api/generate`);
+  console.log(`👉 API Key configured: ${Boolean(OPENAI_API_KEY)}`);
   console.log(`\nTo create a public URL with ngrok:\nngrok http ${PORT}`);
 }); 

@@ -50,6 +50,14 @@ textarea {
   font-size: 14px;
 }
 
+/* Styling for API key input when key is saved */
+.key-saved {
+  background-color: #f8fff8;
+  border-color: #9ad498;
+  color: #5a8f59;
+  font-style: italic;
+}
+
 textarea {
   min-height: 80px;
   resize: vertical;
@@ -83,11 +91,26 @@ button:hover {
   background-color: #900;
 }
 
+.secondary-button {
+  background-color: #0066cc;
+  color: white;
+  border-color: #0055aa;
+  padding: 8px 15px;
+  font-weight: 600;
+  width: 100%;
+  margin: 10px 0;
+}
+
+.secondary-button:hover {
+  background-color: #0055aa;
+}
+
 .api-key-section,
 .server-section,
 .prompt-section,
 .action-section,
 .transcript-section,
+.generated-content-section,
 .status-section {
   margin-bottom: 20px;
 }
@@ -123,6 +146,57 @@ button:hover {
 }
 
 .success {
+  background-color: #eeffee;
+  color: #080;
+}
+
+/* Added styles for generated content */
+.generated-content-section {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px;
+  background-color: #fff;
+  margin: 15px 0;
+}
+
+.content-item {
+  margin-bottom: 12px;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.content-header label {
+  margin-bottom: 0;
+}
+
+.content-box {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 8px;
+  min-height: 40px;
+  max-height: 100px;
+  overflow-y: auto;
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+
+.copy-button {
+  padding: 4px 8px;
+  font-size: 12px;
+  background-color: #f0f0f0;
+}
+
+.copy-button:hover {
+  background-color: #e0e0e0;
+}
+
+.copy-success {
   background-color: #eeffee;
   color: #080;
 } 

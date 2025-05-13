@@ -43,7 +43,7 @@ async function fetchCaptions(videoID, lang = 'en') {
 }
 
 // Function to generate content using our Node.js server
-async function generateContent(apiKey, prompt, transcript) {
+async function generateContent(prompt, transcript) {
   try {
     const serverUrl = await getServerUrl();
     const url = `${serverUrl}/api/generate`;
@@ -56,7 +56,6 @@ async function generateContent(apiKey, prompt, transcript) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        apiKey,
         prompt,
         transcript
       })
@@ -97,7 +96,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === "GENERATE_CONTENT") {
     console.log("Generating content for transcript");
     
-    generateContent(message.apiKey, message.prompt, message.transcript)
+    generateContent(message.prompt, message.transcript)
       .then(response => {
         console.log("Content generated successfully!");
         sendResponse({ success: true, content: response.content });
