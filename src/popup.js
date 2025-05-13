@@ -22,7 +22,7 @@ let currentGeneratedContent = {
 };
 
 // Default prompt
-const DEFAULT_PROMPT = 'Generate a YouTube title and description based on the following transcript. Title should be catchy and SEO-friendly. Description should summarize key points, include timestamps for major sections, and ask viewers to like and subscribe.';
+const DEFAULT_PROMPT = "Generate a YouTube title and description based on the following transcript. Title should be catchy and SEO-friendly. Description should summarize key points, include timestamps for major sections, and ask viewers to like and subscribe. My name is spelled as Aemal Sayer. The technologies I mention and use in my videos include n8n and Vapi. Don't give timestamps, just generate a general information about the current lecture and keep the first part as general information about this crash course called 'Build your own voice ai agent using n8n, vapi and some vibe coding'. Don't mention 'Aemal Sayer' teaches you... don't use the 3rd person, write it from my perspective. Please add hashtags and CTA to comment, subscribe and share for better SEO and reach.";
 
 // Get server URL from background script
 async function getServerUrl() {
